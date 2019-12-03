@@ -21,7 +21,7 @@ def job():
 
 
 def holiday(time, text):
-    url = "https://tool.bitefu.net/jiari/?d=" + time
+    url = "http://tool.bitefu.net/jiari/?d=" + time
     response = json.loads(requests.get(url).text)
     if (response == 0):
         daka(text)
