@@ -14,7 +14,7 @@ tinify.key = 'mhDgfkycPsLfqZyrB5D8TrqlXR8fKPt2'
 
 
 def job():
-    if (datetime.now().strftime("%H:%M") == "09:12"):
+    if (datetime.now().strftime("%H:%M") == "09:09"):
         holiday(time.strftime("%Y-%m-%d", time.localtime()), "早上")
     else:
         holiday(time.strftime("%Y-%m-%d", time.localtime()), "晚上")
@@ -38,8 +38,7 @@ def daka(text):
     time.sleep(20)
     os.system('adb shell screencap -p /sdcard/autojump.png')
     os.system('adb pull /sdcard/autojump.png .')
-    source = tinify.from_file("autojump.png")
-    source.to_file("autojump.png")
+    # source = tinify.from_file("autojump.png").to_file("autojump.png")
     send_email(text)
 
 
