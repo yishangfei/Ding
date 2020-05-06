@@ -3,6 +3,21 @@ import json
 import tinify
 import schedule, requests
 import os, time, smtplib
+from subprocess import run
+from datetime import datetime
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart  # 发送多个部分
+from email.mime.text import MIMEText  # 专门发送正文
+
+# 配置图片压缩
+tinify.key = 'mhDgfkycPsLfqZyrB5D8TrqlXR8fKPt2'
+# -*- coding: utf-8 -*-
+import json
+import tinify
+import schedule, requests
+import os, time, smtplib
+from subprocess import run
 from datetime import datetime
 from email import encoders
 from email.mime.base import MIMEBase
@@ -12,12 +27,11 @@ from email.mime.text import MIMEText  # 专门发送正文
 # 配置图片压缩
 tinify.key = 'mhDgfkycPsLfqZyrB5D8TrqlXR8fKPt2'
 
-
 def job():
-    if (datetime.now().strftime("%H:%M") == "09:09"):
-        holiday(time.strftime("%Y-%m-%d", time.localtime()), "早上")
+    if (datetime.now().strftime("%H:%M") == "09:12"):
+        holiday(time.strftime("%Y-%m-%d", time.localtime()), "上班")
     else:
-        holiday(time.strftime("%Y-%m-%d", time.localtime()), "晚上")
+        holiday(time.strftime("%Y-%m-%d", time.localtime()), "下班")
 
 
 def holiday(time, text):
@@ -30,15 +44,18 @@ def holiday(time, text):
 
 
 def daka(text):
-    os.system('adb kill-server')
-    os.system('adb start-server')
-    os.system('adb shell input keyevent 26')
-    os.system('adb shell am force-stop com.alibaba.android.rimet')
-    os.system('adb shell am start -n com.alibaba.android.rimet/com.alibaba.android.rimet.biz.LaunchHomeActivity')
-    time.sleep(20)
-    os.system('adb shell screencap -p /sdcard/autojump.png')
-    os.system('adb pull /sdcard/autojump.png .')
-    # source = tinify.from_file("autojump.png").to_file("autojump.png")
+    run("adb kill-server")
+    run("adb start-server")
+    with os.popen(r'adb shell dumpsys window policy', 'r') as f:
+        content = f.read()
+    if 'mScreenOnEarly=false' in content:
+        run("adb shell input keyevent 26")
+    run("adb shell am force-stop com.alibaba.android.rimet")
+    run("adb shell am start -n com.alibaba.android.rimet/com.alibaba.android.rimet.biz.LaunchHomeActivity")
+    time.sleep(10)
+    run("adb shell screencap -p /sdcard/Download/autojump.png")
+    run("adb pull /sdcard/Download/autojump.png .")
+    # tinify.from_file("autojump.png").to_file("autojump.png")
     send_email(text)
 
 
@@ -48,7 +65,7 @@ def send_email(text):
     msg['From'] = '248276846@qq.com'  # 发件人
     msg['To'] = '898763215@qq.com'  # 收件人
     # 正文
-    part_text = MIMEText('Hello 易大宝' + time.strftime("%Y-%m-%d", time.localtime()) + text + "成功打卡")
+    part_text = MIMEText('Hello 易大宝' + time.strftime("%Y-%m-%d", time.localtime()) + text + "打卡成功")
     msg.attach(part_text)  # 把正文加到邮件体里面去
     with open('autojump.png', 'rb') as f:
         # 设置附件的MIME和文件名，这里是png类型:
@@ -68,15 +85,17 @@ def send_email(text):
     smtp.login('248276846@qq.com', 'jhsejyfnsblzcbec')
     smtp.sendmail('248276846@qq.com', '898763215@qq.com', msg.as_string())  # 发送邮件
     print('邮件发送成功！')
-    #删除图片
+    #电脑删除图片
     if os.path.exists('autojump.png'):
         os.remove('autojump.png')
     else:
         print('图片删除失败！')
+    #手机删除图片
+    run("adb shell rm /sdcard/Download/autojump.png")
 
 if __name__ == '__main__':
-    schedule.every().day.at("09:09").do(job)
-    schedule.every().day.at("18:00").do(job)
+    schedule.every().day.at("09:12").do(job)
+    schedule.every().day.at("14:13").do(job)
     while True:
         # 启动服务，run_pending()运行所有可以运行的任务
         schedule.run_pending()
