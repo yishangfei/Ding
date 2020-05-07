@@ -3,6 +3,7 @@ import json
 import tinify
 import schedule, requests
 import os, time, smtplib
+from config import *
 from subprocess import run
 from datetime import datetime
 from email import encoders
@@ -12,6 +13,12 @@ from email.mime.text import MIMEText  # 专门发送正文
 
 # 配置图片压缩
 tinify.key = 'mhDgfkycPsLfqZyrB5D8TrqlXR8fKPt2'
+
+def read_config():
+    """"读取配置"""
+    with open("config/config.json") as json_file:
+        config = json.load(json_file)
+    return config
 
 def job():
     if (datetime.now().strftime("%H:%M") == "09:12"):
@@ -30,6 +37,7 @@ def holiday(time, text):
 
 
 def daka(text):
+    config=read_config()
     run("adb kill-server")
     run("adb start-server")
     with os.popen(r'adb shell dumpsys power', 'r') as f:
@@ -39,11 +47,20 @@ def daka(text):
         run("adb shell input keyevent 26")
     run("adb shell am force-stop com.alibaba.android.rimet")
     run("adb shell am start -n com.alibaba.android.rimet/com.alibaba.android.rimet.biz.LaunchHomeActivity")
+    time.sleep(5)
+    run("adb shell input tap "+config["work_x"]+" "+config["work_y"])
+    time.sleep(15)
+    run("adb shell input tap "+config["punch_x"]+" "+config["punch_y"])
     time.sleep(10)
+    if(text=="上班"):
+        run("adb shell input tap " + config["working_x"] + " " + config["working_y"])
+    else:
+        run("adb shell input tap " + config["offwork_x"] + " " + config["offwork_y"])
+    time.sleep(5)
     run("adb shell screencap -p /sdcard/Download/autojump.png")
     run("adb pull /sdcard/Download/autojump.png .")
     run("adb shell rm /sdcard/Download/autojump.png")
-    tinify.from_file("autojump.png").to_file("autojump.png")
+    # tinify.from_file("autojump.png").to_file("autojump.png")
     send_email(text)
 
 
