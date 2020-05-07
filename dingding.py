@@ -12,20 +12,6 @@ from email.mime.text import MIMEText  # 专门发送正文
 
 # 配置图片压缩
 tinify.key = 'mhDgfkycPsLfqZyrB5D8TrqlXR8fKPt2'
-# -*- coding: utf-8 -*-
-import json
-import tinify
-import schedule, requests
-import os, time, smtplib
-from subprocess import run
-from datetime import datetime
-from email import encoders
-from email.mime.base import MIMEBase
-from email.mime.multipart import MIMEMultipart  # 发送多个部分
-from email.mime.text import MIMEText  # 专门发送正文
-
-# 配置图片压缩
-tinify.key = 'mhDgfkycPsLfqZyrB5D8TrqlXR8fKPt2'
 
 def job():
     if (datetime.now().strftime("%H:%M") == "09:12"):
