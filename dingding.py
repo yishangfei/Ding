@@ -46,16 +46,18 @@ def holiday(time, text):
 def daka(text):
     run("adb kill-server")
     run("adb start-server")
-    with os.popen(r'adb shell dumpsys window policy', 'r') as f:
+    with os.popen(r'adb shell dumpsys power', 'r') as f:
         content = f.read()
-    if 'mScreenOnEarly=false' in content:
+    if 'Display Power: state=OFF' in content:
+        print('屏幕已灭屏。')
         run("adb shell input keyevent 26")
     run("adb shell am force-stop com.alibaba.android.rimet")
     run("adb shell am start -n com.alibaba.android.rimet/com.alibaba.android.rimet.biz.LaunchHomeActivity")
     time.sleep(10)
     run("adb shell screencap -p /sdcard/Download/autojump.png")
     run("adb pull /sdcard/Download/autojump.png .")
-    # tinify.from_file("autojump.png").to_file("autojump.png")
+    run("adb shell rm /sdcard/Download/autojump.png")
+    tinify.from_file("autojump.png").to_file("autojump.png")
     send_email(text)
 
 
@@ -90,13 +92,12 @@ def send_email(text):
         os.remove('autojump.png')
     else:
         print('图片删除失败！')
-    #手机删除图片
-    run("adb shell rm /sdcard/Download/autojump.png")
 
 if __name__ == '__main__':
-    schedule.every().day.at("09:12").do(job)
-    schedule.every().day.at("14:13").do(job)
-    while True:
-        # 启动服务，run_pending()运行所有可以运行的任务
-        schedule.run_pending()
-        time.sleep(1)
+    daka("")
+    # schedule.every().day.at("09:12").do(job)
+    # schedule.every().day.at("09:32").do(job)
+    # while True:
+    #     # 启动服务，run_pending()运行所有可以运行的任务
+    #     schedule.run_pending()
+    #     time.sleep(1)
